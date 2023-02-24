@@ -13,7 +13,9 @@ namespace Microsoft.BotBuilderSamples.Bots
     {
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var replyText = $"Echo: {turnContext.Activity.Text}";
+            //var replyText = $"Vinod!: {turnContext.Activity.Text}";
+            var _openAIService = new OpenAIService();
+            var replyText = await _openAIService.GetResponse(turnContext.Activity.Text);
             await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);
         }
 
