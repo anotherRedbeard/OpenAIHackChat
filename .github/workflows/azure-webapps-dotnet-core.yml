@@ -38,8 +38,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: saurabh-playground
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v2
