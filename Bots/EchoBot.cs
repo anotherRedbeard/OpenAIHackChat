@@ -21,23 +21,9 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             var replyText = $"Echo: {turnContext.Activity.Text}";
-            var json = JsonConvert.SerializeObject(new
-            {
-                prompt = turnContext.Activity.Text,
-                temperature = 0.5,
-                max_tokens = 50,
-                model = "text-davinci-003"
+            var openAIService = new OpenAIService();
+            var result = await openAIService.GetResponse(turnContext.Activity.Text);
 
-            });
-            _httpClient = new HttpClient();
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + "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");
-            //var response = await _httpClient.PostAsync("https://api.openai.com/v1/engines/davinci/completions", content);
-            var response = await _httpClient.PostAsync(" https://api.openai.com/v1/completions", content);
-
-
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<SentenceResponse>(responseJson);
             await turnContext.SendActivityAsync(MessageFactory.Text(result.choices[0].text, result.choices[0].text), cancellationToken);
         }
 
