@@ -5,12 +5,19 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.BotBuilderSamples.Models;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace Microsoft.BotBuilderSamples.Bots
 {
     public class OpenAIService
     {
+        private readonly IConfiguration _iConfig;
+        public OpenAIService(IConfiguration iconfig)
+        {
+            _iConfig = iconfig;
+        }
+
         private HttpClient _httpClient;
         public async Task<SentenceResponse> GetResponse(string prompt)
         {
@@ -25,7 +32,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             
             _httpClient = new HttpClient();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + "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");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _iConfig.GetValue<string>("MySettings_OAIApiKey"));
             //var response = await _httpClient.PostAsync("https://api.openai.com/v1/engines/davinci/completions", content);
             var response = await _httpClient.PostAsync(" https://api.openai.com/v1/completions", content);
             //var response = await _httpClient.PostAsync("https://api.openai.com/v1/embeddings", content);
