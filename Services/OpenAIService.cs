@@ -25,7 +25,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             
             _httpClient = new HttpClient();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + "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");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + "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");
             //var response = await _httpClient.PostAsync("https://api.openai.com/v1/engines/davinci/completions", content);
             var response = await _httpClient.PostAsync(" https://api.openai.com/v1/completions", content);
             //var response = await _httpClient.PostAsync("https://api.openai.com/v1/embeddings", content);
