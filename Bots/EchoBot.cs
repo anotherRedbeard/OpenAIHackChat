@@ -6,29 +6,51 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
+using Microsoft.BotBuilderSamples.Bots;
+using Microsoft.BotBuilderSamples.Models;
 
 namespace Microsoft.BotBuilderSamples.Bots
 {
     public class EchoBot : ActivityHandler
     {
+        private HttpClient _httpClient;
+
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            //var replyText = $"Vinod!: {turnContext.Activity.Text}";
-            var _openAIService = new OpenAIService();
-            var replyText = await _openAIService.GetResponse(turnContext.Activity.Text);
-            await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);
+            var replyText = $"Echo: {turnContext.Activity.Text}";
+            var json = JsonConvert.SerializeObject(new
+            {
+                prompt = turnContext.Activity.Text,
+                temperature = 0.5,
+                max_tokens = 50,
+                model = "text-davinci-003"
+
+            });
+            _httpClient = new HttpClient();
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + "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");
+            //var response = await _httpClient.PostAsync("https://api.openai.com/v1/engines/davinci/completions", content);
+            var response = await _httpClient.PostAsync(" https://api.openai.com/v1/completions", content);
+
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<SentenceResponse>(responseJson);
+            await turnContext.SendActivityAsync(MessageFactory.Text(result.choices[0].text, result.choices[0].text), cancellationToken);
         }
 
-        protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
+    protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
+    {
+        var welcomeText = "Hello and welcome!";
+        foreach (var member in membersAdded)
         {
-            var welcomeText = "Hello and welcome!";
-            foreach (var member in membersAdded)
+            if (member.Id != turnContext.Activity.Recipient.Id)
             {
-                if (member.Id != turnContext.Activity.Recipient.Id)
-                {
-                    await turnContext.SendActivityAsync(MessageFactory.Text(welcomeText, welcomeText), cancellationToken);
-                }
+                await turnContext.SendActivityAsync(MessageFactory.Text(welcomeText, welcomeText), cancellationToken);
             }
         }
+    }
     }
 }
