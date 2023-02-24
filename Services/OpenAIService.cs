@@ -25,7 +25,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             
             _httpClient = new HttpClient();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + "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");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + "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");
             //var response = await _httpClient.PostAsync("https://api.openai.com/v1/engines/davinci/completions", content);
             var response = await _httpClient.PostAsync(" https://api.openai.com/v1/completions", content);
             //var response = await _httpClient.PostAsync("https://api.openai.com/v1/embeddings", content);
@@ -34,8 +34,15 @@ namespace Microsoft.BotBuilderSamples.Bots
                     // Handle error
             }
             var responseJson = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<SentenceResponse>(responseJson);
-            return result;
+            try{
+                var result = JsonConvert.DeserializeObject<SentenceResponse>(responseJson);
+                return result;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new SentenceResponse();
+            }
         }
     }
 }
